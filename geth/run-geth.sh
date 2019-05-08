@@ -73,7 +73,7 @@ EOF
             -p 8545:8545 -p 30303:30303 \
             ethereum/client-go:stable \
             --datadir /root \
-            --networkid $CHAINID
+            --networkid $CHAINID \
             --rpc --rpcadd "0.0.0.0" \
             console
     
