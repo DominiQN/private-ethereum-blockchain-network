@@ -57,7 +57,7 @@ EOF
     sudo mv ./genesis.json /var/dockerstorage/ethereum/
     sudo chmod 640 /var/dockerstorage/ethereum/genesis.json
 
-    docker run --name ethereum-node \
+    docker run --name ethereum-generate-genesis-block \
             -it \
             --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
             ethereum/client-go:stable \
@@ -65,7 +65,7 @@ EOF
             console \
             --datadir /root
             
-    docker rm ethereum-node
+    docker rm ethereum-generate-genesis-block
 
     docker run --name ethereum-node \
             -it \
