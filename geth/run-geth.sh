@@ -30,9 +30,9 @@ echo "docker run ethereum/client-go:stable"
 
 CHAINID=85183515
 
+echo $(hostname)
 if [ $(hostname) = "HT-D-11"]
 then
-    echo $(hostname)
     echo "create 'genesis.json'"
 
     sudo cat <<EOF >./genesis.json
@@ -72,11 +72,12 @@ EOF
             --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
             -p 8545:8545 -p 30303:30303 \
             ethereum/client-go:stable \
+            --rpc \
+            --rpcadd "0.0.0.0" \
             --datadir /root \
             --networkid $CHAINID \
-            --rpc --rpcadd "0.0.0.0" \
             console
     
 else
-    echo $(hostname)
+
 fi
