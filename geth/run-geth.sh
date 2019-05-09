@@ -73,7 +73,9 @@ EOF
             -p 8545:8545 -p 30303:30303 \
             ethereum/client-go:stable \
             --rpc \
-            --rpcadd "0.0.0.0" \
+            --rpcaddr "0.0.0.0" \
+            # 나중에 domain 명시해주어야 함
+            --rpccorsdomain "*" \
             --datadir /root \
             --networkid $CHAINID \
             console
