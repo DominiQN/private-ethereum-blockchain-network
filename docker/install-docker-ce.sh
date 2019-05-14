@@ -1,4 +1,4 @@
-# 2019-04-30
+# 2019-05-14
 
 sudo apt-get update
 
@@ -25,9 +25,6 @@ sudo apt-get update
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# 사용자 이름이 달라지면 고쳐야 함
-echo "htbeyond"
-
-sudo usermod -aG docker htbeyond
+sudo usermod -aG docker "$(whoami)" 
 
 echo "logout please"
