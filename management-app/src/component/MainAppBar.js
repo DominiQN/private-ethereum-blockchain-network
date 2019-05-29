@@ -3,24 +3,14 @@ import { makeStyles } from '@material-ui/styles'
 import { AppBar, Toolbar, Typography } from '@material-ui/core'
 import { grey } from '@material-ui/core/colors';
 import AppBarSpacer from './AppBarSpacer'
-
-const drawerWidth = 240
-const drawerZIndex = 10
+import Styles from '../constant/Styles'
 
 const useStyles = makeStyles({
   root: {
     display: 'flex',
   },
   appBar: {
-    zIndex: drawerZIndex + 1,
-  },
-  drawer: {
-    width: drawerWidth,
-    zIndex: drawerZIndex,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth
+    zIndex: Styles.drawerZIndex + 1,
   },
   content: {
     flexGrow: 1,

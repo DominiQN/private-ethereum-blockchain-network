@@ -1,24 +1,47 @@
 import React, { useState } from 'react'
-import MainAppBar from '../component/MainAppBar';
+import { makeStyles } from '@material-ui/styles'
+import MainAppBar from '../component/MainAppBar'
+import MainDrawer from '../component/MainDrawer'
+import CardListPage from './CardListPage'
+import CardCreatePage from './CardCreatePage'
+import HistoryPage from './HistoryPage'
+import Styles from '../constant/Styles';
+
+const useStyles = makeStyles({
+  main: {
+    flex: 1,
+    marginLeft: Styles.drawerWidth,
+    padding: 16,
+  },
+})
 
 function Main() {
-  const [headerText, setHeaderText] = useState("카드")
+  const [mainOptions, setMainOptions] = useState({
+    menuIndex: 0,
+    pageTitle: "",
+  })
+  const classes = useStyles()
+  const getPage = (index, title) => {
+    const pageList = [
+      <CardListPage title={title} />,
+      <CardCreatePage title={title} />,
+      <HistoryPage title={title} />,
+    ]
+    return pageList[index]
+  }
+
   return (
     <div className="App">
-      <MainAppBar headerText={headerText} />
-      <div className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </div>
+      <MainAppBar headerText={"Bridge"} />
+      <MainDrawer onItemClick={(index, value) => {
+        setMainOptions({
+          menuIndex: index,
+          pageTitle: value,
+        })
+      }} />
+      <main className={classes.main}>
+        {getPage(mainOptions.menuIndex, mainOptions.pageTitle)}
+      </main>
     </div>
   )
 }
