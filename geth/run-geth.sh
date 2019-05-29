@@ -30,8 +30,8 @@ echo "docker run ethereum/client-go:stable"
 
 CHAINID=85183515
 
-echo $(hostname)
-if [ $(hostname) = "HT-D-11"]
+echo $(whoami)
+if [ $(whoami) = "HT-D-11"]
 then
     echo "create 'genesis.json'"
 
@@ -62,11 +62,11 @@ EOF
             --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
             ethereum/client-go:stable \
             init /root/genesis.json \
-            console \
             --datadir /root
             
     docker rm ethereum-generate-genesis-block
 
+    # 나중에 domain 명시해주어야 함
     docker run --name ethereum-node \
             -it \
             --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
@@ -74,7 +74,7 @@ EOF
             ethereum/client-go:stable \
             --rpc \
             --rpcaddr "0.0.0.0" \
-            # 나중에 domain 명시해주어야 함
+            --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
             --rpccorsdomain "*" \
             --datadir /root \
             --networkid $CHAINID \
