@@ -1,17 +1,17 @@
  - 데이터 타입
-   - 카드 구조체
-     - 계정 주소
-     - 카드 ID
-     - 카드 상태
-     - 동
-     - 호
-     - 시설 권한 매핑 리스트
+   - 카드 구조체 [Card]
+     - 계정 주소 [account]
+     - 카드 ID [id]
+     - 카드 상태 [status]
+     - 동 [dong]
+     - 호 [ho]
+     - 시설 권한 매핑 리스트 [auth]
        - key: 시설 IP
        - value: 시설 구조체
-   - 시설 구조체
-     - 시설 이름
-     - 시설 IP
-     - 시설 상태
+   - 시설 구조체 [Facility]
+     - 시설 이름  [name]
+     - 시설 IP [ip]
+     - 시설 상태 [status]
 
  - 가짜 데이터
    - 시설
@@ -68,25 +68,25 @@
      ]
 
  - 함수
-   - 단일 시설 정보 조회(ip)
-   - 시설 생성(ip, 이름, 상태)
+   - 단일 시설 정보 조회(ip) [getFacilityInfo()]
+   - 시설 생성(ip, 이름, 상태) [createFacility()]
      - 주어진 params로 시설 생성 후 저장
-   - 시설 리스트 조회() {
+   - 시설 리스트 조회() { [getFacilityList()]
      return facilityList
    }
 
-   - 단일 카드 정보 조회(account)
-   - 카드 생성(id, status, dong, ho)
+   - 단일 카드 정보 조회(account) [getCardInfo()]
+   - 카드 생성(id, status, dong, ho) [createCard()]
      - 중복 체크
        - 동일 계정으로 카드를 생성하는지 카드를 조회하여 체크
      - 시설 valid 체크
        - 주어진 시설이 존재하는 시설인지 확인 후
      - 주어진 params로 카드 생성 후 저장
-   - 카드 리스트 조회() {
+   - 카드 리스트 조회() { [getCardList()]
      return cardList
    }
 
-   - 카드 이력 생성(카드 계정(or 카드 id), 시설 ip)
+   - 카드 이력 생성(카드 계정(or 카드 id), 시설 ip) [access()]
      - 유효성 검증 1: 카드 valid 체크
        - 주어진 카드 계정이 등록된 카드 계정인지(존재하는지)
        - 주어진 카드 계정의 상태가 정상인지
@@ -94,4 +94,4 @@
        - 해당 시설에 대한 통과 권한이 있는 카드인지
      - 유효성이 검증되었다면, 카드, 시설, 시간 저장
 
-   - 카드 이력 조회()
+   - 카드 이력 조회() [getHistory()]
