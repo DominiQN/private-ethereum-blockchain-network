@@ -1,0 +1,95 @@
+ - 데이터 타입
+   - 카드 구조체
+     - 계정 주소
+     - 카드 ID
+     - 카드 상태
+     - 동
+     - 호
+     - 시설 권한 매핑 리스트
+       - key: 시설 IP
+       - value: 시설 구조체
+   - 시설 구조체
+     - 시설 이름
+     - 시설 IP
+     - 시설 상태
+
+ - 가짜 데이터
+   - 시설
+     {
+       ip: '192.168.100.20',
+       name: 'GX룸',
+     },
+     {
+       ip: '192.168.100.21',
+       name: '피트니스 센터',
+     },
+     {
+       ip: '192.168.100.22',
+       name: '사우나',
+     },
+     {
+       ip: '192.168.100.23',
+       name: '수영장',
+     }
+   - 카드
+     [
+       {
+         id: 'da00001',
+         account: '0x2af1a3e34b5bd227e27e132c1051fe832479ec59',
+         status: CardStatus.NORMAL,
+         dong: '101',
+         ho: '101',
+         auth: [...mockFacilityList],
+       },
+       {
+         id: 'da00002',
+         account: '0x750c79253dc3bff94d6b46da5b833ff761a4a665',
+         status: CardStatus.NORMAL,
+         dong: '101',
+         ho: '102',
+         auth: [],
+       },
+       {
+         id: 'da00003',
+         account: '0x9261f95c7c5ac4a0083007f9c592b1cb1b4ac8be',
+         status: CardStatus.NORMAL,
+         dong: '101',
+         ho: '103',
+         auth: mockFacilityList.slice(0, 2),
+       },
+       {
+         id: 'da00004',
+         account: '0x71028fc6dc0713d3f7416ac5eba7dbea26f0383e',
+         status: CardStatus.SUSPENDED,
+         dong: '101',
+         ho: '104',
+         auth: mockFacilityList.slice(0, 2),
+       },
+     ]
+
+ - 함수
+   - 단일 시설 정보 조회()
+   - 시설 생성()
+     - 주어진 params로 시설 생성 후 저장
+   - 시설 리스트 조회() {
+     return facilityList
+   }
+
+   - 단일 카드 정보 조회()
+   - 카드 생성()
+     - 중복 체크
+       - 동일 계정으로 카드를 생성하는지 카드를 조회하여 체크
+     - 시설 valid 체크
+       - 주어진 시설이 존재하는 시설인지 확인 후
+     - 주어진 params로 카드 생성 후 저장
+   - 카드 리스트 조회()
+
+   - 카드 이력 생성(카드 계정(or 카드 id), 시설 ip)
+     - 유효성 검증 1: 카드 valid 체크
+       - 주어진 카드 계정이 등록된 카드 계정인지(존재하는지)
+       - 주어진 카드 계정의 상태가 정상인지
+     - 유효성 검증 2: 권한 체크
+       - 해당 시설에 대한 통과 권한이 있는 카드인지
+     - 유효성이 검증되었다면, 카드, 시설, 시간 저장
+
+   - 카드 이력 조회()
