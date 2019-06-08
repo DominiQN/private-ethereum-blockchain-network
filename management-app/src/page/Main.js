@@ -6,6 +6,12 @@ import CardListPage from './CardListPage'
 import CardCreatePage from './CardCreatePage'
 import HistoryPage from './HistoryPage'
 import Styles from '../constant/Styles';
+import TitleBar from '../component/TitleBar';
+import { mockCardList } from '../util/MockDataUtil'
+
+const MockContext = React.createContext({
+  cardList: mockCardList,
+})
 
 const useStyles = makeStyles({
   main: {
@@ -18,7 +24,7 @@ const useStyles = makeStyles({
 function Main() {
   const [mainOptions, setMainOptions] = useState({
     menuIndex: 0,
-    pageTitle: "",
+    pageTitle: "카드 리스트",
   })
   const classes = useStyles()
   const getPage = (index, title) => {
@@ -33,13 +39,17 @@ function Main() {
   return (
     <div className="App">
       <MainAppBar headerText={"Bridge"} />
-      <MainDrawer onItemClick={(index, value) => {
-        setMainOptions({
-          menuIndex: index,
-          pageTitle: value,
-        })
-      }} />
+      <MainDrawer
+        selected={mainOptions.menuIndex}
+        onItemClick={(index, title) => {
+          setMainOptions({
+            menuIndex: index,
+            pageTitle: title,
+          })
+        }} 
+      />
       <main className={classes.main}>
+        <TitleBar title={mainOptions.pageTitle}/>
         {getPage(mainOptions.menuIndex, mainOptions.pageTitle)}
       </main>
     </div>

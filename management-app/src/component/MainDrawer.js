@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Drawer, List, ListItemText, ListItem, Divider } from '@material-ui/core';
 import Styles from '../constant/Styles'
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
 })
 
-function MainDrawer() {
+function MainDrawer({ selected, onItemClick }) {
   const classes = useStyles()
   return (
     <Drawer
@@ -35,10 +35,20 @@ function MainDrawer() {
         <ListItem className={classes.menuItem}>
           <ListItemText primary="카드 관리" />
         </ListItem>
-        <ListItem className={classes.nestedMenuItem}>
+        <ListItem
+          button
+          selected={selected === 0}
+          onClick={() => onItemClick(0, "카드 리스트")}
+          className={classes.nestedMenuItem}
+          >
           <ListItemText primary="카드 리스트" />
         </ListItem>
-        <ListItem className={classes.nestedMenuItem}>
+        <ListItem
+          button
+          selected={selected === 1}
+          onClick={() => onItemClick(1, "카드 생성")}
+          className={classes.nestedMenuItem}
+          >
           <ListItemText primary="카드 생성" />
         </ListItem>
 
@@ -47,7 +57,12 @@ function MainDrawer() {
         <ListItem className={classes.menuItem}>
           <ListItemText primary="이력 관리" />
         </ListItem>
-        <ListItem className={classes.nestedMenuItem}>
+        <ListItem
+          button
+          selected={selected === 2}
+          onClick={() => onItemClick(2, "이력 조회")}
+          className={classes.nestedMenuItem}
+        >
           <ListItemText primary="이력 조회" />
         </ListItem>
         
