@@ -76,6 +76,10 @@ EOF
             --rpcaddr "0.0.0.0" \
             --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
             --rpccorsdomain "*" \
+            --ws \
+            --wsaddr "0.0.0.0" \
+            --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
+            --wsorigins "*" \
             --datadir /root \
             --networkid $CHAINID \
             console
@@ -83,3 +87,5 @@ EOF
 else
 
 fi
+
+    # enode://d73598abfbe614546d56b31600265115749fe1191c07e87a69797dc556c3fd23aae8165a07956d8a51675835fa4367fec9bdd6a0557701073b01d3ada009183e@192.168.0.53:30303?discport=4618
