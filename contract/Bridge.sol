@@ -6,20 +6,37 @@ contract Bridge {
     uint256 public totalSupply; // 토큰 총량
     mapping (address => uint256) public balanceOf; // 각 주소의 잔고
     
-    // Card info and card set
+    // status
+    enum Status { SUSPENDED, NORMAL }
+    mapping(string => Status) private stringToStatus;
+    mapping(uint8 => string) private statusToString;
+    
+    // 시설
+    struct Facility {
+        string ip;
+        string name;
+        Status status;
+    }
+    mapping(string => Facility) private facilitys;
+    string[] facilityKeys;
+    
+    // 카드
     struct Card {
+        address addr;
         string id;
-        string status;
-        uint32 dong;
-        uint32 ho;
+        Status status;
+        string dong;
+        string ho;
+        mapping(string => Facility) auth;
     }
     mapping(address => Card) private cards;
+    address[] cardKeys;
 
     
     // log events
-    event getCardEvent(address addr, string id, string status, uint32 dong, uint32 ho);
-    event setCardSuccessEvent(address addr, string id, string status, uint32 dong, uint32 ho);
-    event setCardFailureEvent(address addr, string id, string status, uint32 dong, uint32 ho);
+    event getCardEvent(address addr, string id, string status, string dong, string ho);
+    event setCardSuccessEvent(address addr, string id, string status, string dong, string ho);
+    event setCardFailureEvent(address addr, string id, string status, string dong, string ho);
     event transferEvent(address from, address to, uint256 value);
     
        // (3) 생성자
@@ -29,29 +46,42 @@ contract Bridge {
         symbol = _symbol;
         decimals = _decimals;
         totalSupply = _supply;
+        // enums 정의
+        stringToStatus["SUSPENDED"] = Status.SUSPENDED;
+        stringToStatus["NORMAL"] = Status.NORMAL;
+        statusToString[uint8(Status.SUSPENDED)] = "SUSPENDED";
+        statusToString[uint8(Status.NORMAL)] = "NORMAL";
     }
 
     function equals(string s1, string s2) public pure returns(bool){
         return keccak256(s1) == keccak256(s2);
     }
     
-    function setCard(address addr, string id, string status, uint32 dong, uint32 ho) public {
+    function addCard(address addr, string id, Status status, string dong, string ho) private {
+        cards[addr] = Card({ id: id, addr: addr, status: status, dong: dong, ho: ho});
+        cardKeys.push(addr);
+    }
+    
+    function createCard(address addr, string id, string status, string dong, string ho) public {
         Card card = cards[addr];
+        Status stat = stringToStatus[status];
+        
         if (equals(card.id, "")) {
-            cards[addr] = Card(id, status, dong, ho);
+            addCard(addr, id, stat, dong, ho);
             setCardSuccessEvent(addr, id, status, dong, ho);
         } else {
             setCardFailureEvent(addr, id, status, dong, ho);
         }
     }
     
-    function getCard(address addr) public {
+    function getCardInfo(address addr) public returns(address, string, string, string, string) {
         Card card = cards[addr];
+        return (card.addr, card.id, statusToString[uint8(card.status)], card.dong, card.ho);
     } 
     
     function isValidCard(address _to) private returns(bool) {
         Card card = cards[_to];
-        return (!equals(card.id, "") && equals(card.status, "NORMAL"));
+        return (!equals(card.id, "") && card.status == Status.NORMAL);
     }
     
     function transfer(address _to, uint256 _value) {
