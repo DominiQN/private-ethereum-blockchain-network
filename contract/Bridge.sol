@@ -23,12 +23,12 @@ contract Bridge {
 
     // 시설
     struct Facility {
-        string ip;
+        uint32 ip;
         string name;
         Status status;
     }
-    mapping(string => Facility) private facilitys;
-    string[] facilityKeys;
+    mapping(uint32 => Facility) private facilitys;
+    uint32[] facilityKeys;
     uint8 facilitysLength = 0;
 
     // 카드
@@ -38,7 +38,7 @@ contract Bridge {
         Status status;
         string dong;
         string ho;
-        mapping(string => Facility) auth;
+        mapping(uint32 => Facility) auth;
     }
     mapping(address => Card) private cards;
     address[] cardKeys;
@@ -49,6 +49,15 @@ contract Bridge {
     event setCardSuccessEvent(address addr, string id, string status, string dong, string ho);
     event setCardFailureEvent(address addr, string id, string status, string dong, string ho);
     event transferEvent(address from, address to, uint256 value);
+    event AccessHistory(
+        uint256 indexed timestamp,
+        address indexed cardAddr,
+        uint32 indexed facilityIp,
+        string cardId,
+        string dong,
+        string ho,
+        string facilityName
+    );
 
        // (3) 생성자
     constructor (uint256 _supply, string memory _name, string memory _symbol, uint8 _decimals) public {
@@ -125,9 +134,9 @@ contract Bridge {
         // pagination을 위해 제수에 1을 빼고 나머지에 1을 더한다.
         (lastPage, lastPageSize) = divide(cardsLength - 1, size);
         lastPageSize++;
-        
+
         require(page <= lastPage, "'page' must be less than last page");
-        
+
         cursor = page * size;
         if (page == lastPage) {
             currentPageSize = lastPageSize;
@@ -146,9 +155,49 @@ contract Bridge {
         }
     }
 
-    function transfer(address payable _to, uint256 _value) public {
-        assert(isValidCard(_to));
-        _to.transfer(_value);
-        emit transferEvent(msg.sender, _to, _value);
+    function access(address addr, uint32 facilityIp, uint256 accessTimestamp) public returns(bool authorized) {
+        Card memory card = cards[addr];
+        // 카드 체크
+        require(
+            card.addr != address(0),
+            "Card not exists."
+        );
+        // 상태 체크
+        require(
+            card.status == Status.NORMAL,
+            "Card status is not normal status."
+        );
+        // 권한 체크
+        Facility memory facility = cards[addr].auth[facilityIp];
+        require(
+            facility.ip != 0,
+            "Card not have auth to pass the given facility."
+        );
+        // event AccessHistory(
+        //     uint256 indexed datetime,
+        //     address indexed cardAddr,
+        //     uint32 indexed facilityIp,
+        //     string cardId,
+        //     string dong,
+        //     string ho,
+        //     string facilityName
+        // );
+
+        // 이력 저장
+        emit AccessHistory(
+            accessTimestamp,
+            card.addr,
+            facility.ip,
+            card.id,
+            card.dong,
+            card.ho,
+            facility.name
+        );
+        return true;
     }
+    // function transfer(address payable _to, uint256 _value) public {
+    //     assert(isValidCard(_to));
+    //     _to.transfer(_value);
+    //     emit transferEvent(msg.sender, _to, _value);
+    // }
 }
