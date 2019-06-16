@@ -80,6 +80,29 @@ contract Bridge {
         remainder = numerator - denominator * quotient;
     }
 
+    function addFacility(uint32 ip, string memory name, Status status) private {
+        facilitys[ip] = Facility(ip, name, status);
+        facilityKeys.push(ip);
+        facilitysLength++;
+    }
+
+    function createFacility(uint32 ip, string memory name, string memory status) public {
+        Facility memory facility = facilitys[ip];
+        require(facility.ip == 0, "ip already exists");
+        Status stat = stringToStatus[status];
+        require(stat != Status.UNDEFINED, "invalid status");
+        addFacility(ip, name, stat);
+        emit SetFacility(ip, name, status);
+    }
+
+    function getFacilityInfo(uint32 givenIp) public view returns(uint32 ip, string memory name, string memory status) {
+        Facility memory facility = facilitys[givenIp];
+        require(facility.ip != 0, "There is no facility.");
+        ip = facility.ip;
+        name = facility.name;
+        status = statusToString[uint8(facility.status)];
+    }
+
     function addCard(address addr, string memory id, Status status, string memory dong, string memory ho) private {
         cards[addr] = Card({ id: id, addr: addr, status: status, dong: dong, ho: ho});
         cardKeys.push(addr);
