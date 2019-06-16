@@ -199,7 +199,7 @@ contract Bridge {
         ho = card.ho;
     }
 
-    function getCardAuth(address addr) public returns(uint32[] memory ips, string[] memory names, uint size) {
+    function getCardAuth(address addr) public view returns(uint32[] memory ips, string[] memory names, uint size) {
         require(isValidCard(addr), 'invalid card');
         Facility memory currentFacility;
         ips = new uint32[](facilitysLength);
