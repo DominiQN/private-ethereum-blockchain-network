@@ -67,6 +67,7 @@ contract Bridge {
     // events
     event SetCard(address addr, string id, string status, string dong, string ho);
     event SetFacility(uint32 ip, string name, string status);
+    event AddCardAuth(address indexed addr, uint32 indexed ip);
     event AccessHistory(
         uint256 indexed timestamp,
         address indexed cardAddr,
@@ -196,6 +197,43 @@ contract Bridge {
         status = statusToString[uint8(card.status)];
         dong = card.dong;
         ho = card.ho;
+    }
+
+    function getCardAuth(address addr) public returns(uint32[] memory ips, string[] memory names, uint size) {
+        require(isValidCard(addr), 'invalid card');
+        Facility memory currentFacility;
+        ips = new uint32[](facilitysLength);
+        names = new string[](facilitysLength);
+        size = 0;
+        for(uint i = 0; i < facilitysLength; i++) {
+            currentFacility = cards[addr].auth[facilityKeys[i]];
+            if((currentFacility.ip != 0) && (currentFacility.status == Status.NORMAL)) {
+                ips[size] = currentFacility.ip;
+                names[size] = currentFacility.name;
+                size++;
+            }
+        }
+        // size = currentLength;
+    }
+    
+    function clearAuth(address addr) public {
+        require(isValidCard(addr), 'invalid card');
+        for(uint i = 0; i < facilitysLength; i++) {
+            cards[addr].auth[facilityKeys[i]].ip = 0;
+            cards[addr].auth[facilityKeys[i]].name = "";
+            cards[addr].auth[facilityKeys[i]].status = Status.UNDEFINED;
+        }
+    }
+    
+    function updateCardAuth(address addr, uint32[] memory auth) public {
+        require(isValidCard(addr), 'invalid card');
+        Facility memory currentFacility;
+        clearAuth(addr);
+        for(uint i = 0; i < auth.length; i++) {
+            currentFacility = facilitys[auth[i]];
+            require(currentFacility.ip != 0, "non-existent facility was passed by param 'auth'");
+            cards[addr].auth[auth[i]] = currentFacility;
+        }
     }
 
     function isValidCard(address _to) private view returns(bool) {
