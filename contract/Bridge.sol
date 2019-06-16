@@ -17,7 +17,7 @@ contract Bridge {
     mapping (address => uint256) public balanceOf; // 각 주소의 잔고
 
     // status
-    enum Status { SUSPENDED, NORMAL }
+    enum Status { UNDEFINED, SUSPENDED, NORMAL }
     mapping(string => Status) private stringToStatus;
     mapping(uint8 => string) private statusToString;
 
@@ -28,8 +28,8 @@ contract Bridge {
         Status status;
     }
     mapping(uint32 => Facility) private facilitys;
-    uint32[] facilityKeys;
-    uint8 facilitysLength = 0;
+    uint32[] private facilityKeys;
+    uint8 private facilitysLength = 0;
 
     // 카드
     struct Card {
@@ -41,14 +41,12 @@ contract Bridge {
         mapping(uint32 => Facility) auth;
     }
     mapping(address => Card) private cards;
-    address[] cardKeys;
-    uint8 cardsLength = 0;
+    address[] private cardKeys;
+    uint8 private cardsLength = 0;
 
-    // log events
-    event getCardEvent(address addr, string id, string status, string dong, string ho);
-    event setCardSuccessEvent(address addr, string id, string status, string dong, string ho);
-    event setCardFailureEvent(address addr, string id, string status, string dong, string ho);
-    event transferEvent(address from, address to, uint256 value);
+    // events
+    event SetCard(address addr, string id, string status, string dong, string ho);
+    event SetFacility(uint32 ip, string name, string status);
     event AccessHistory(
         uint256 indexed timestamp,
         address indexed cardAddr,
@@ -78,7 +76,7 @@ contract Bridge {
     }
 
     function divide(uint numerator, uint denominator) private pure returns(uint quotient, uint remainder) {
-        quotient  = numerator / denominator;
+        quotient = numerator / denominator;
         remainder = numerator - denominator * quotient;
     }
 
@@ -90,20 +88,22 @@ contract Bridge {
 
     function createCard(address addr, string memory id, string memory status, string memory dong, string memory ho) public returns(uint) {
         Card memory card = cards[addr];
+        require(equals(card.id, ""), "address already exists.");
         Status stat = stringToStatus[status];
-        
-        if (equals(card.id, "")) {
-            addCard(addr, id, stat, dong, ho);
-            emit setCardSuccessEvent(addr, id, status, dong, ho);
-        } else {
-            emit setCardFailureEvent(addr, id, status, dong, ho);
-        }
+        require(stat != Status.UNDEFINED, "invalid status");
+        addCard(addr, id, stat, dong, ho);
+        emit SetCard(addr, id, status, dong, ho);
         return getCardSize();
     }
 
-    function getCardInfo(address addr) public view returns(address, string memory, string memory, string memory, string memory) {
-        Card memory card = cards[addr];
-        return (card.addr, card.id, statusToString[uint8(card.status)], card.dong, card.ho);
+    function getCardInfo(address givenAddr) public view returns(address addr, string memory id, string memory status, string memory dong, string memory ho) {
+        Card memory card = cards[givenAddr];
+        require(!equals(card.id, ""), "There is no card");
+        addr = card.addr;
+        id = card.id;
+        status = statusToString[uint8(card.status)];
+        dong = card.dong;
+        ho = card.ho;
     }
 
     function isValidCard(address _to) private view returns(bool) {
@@ -173,15 +173,6 @@ contract Bridge {
             facility.ip != 0,
             "Card not have auth to pass the given facility."
         );
-        // event AccessHistory(
-        //     uint256 indexed datetime,
-        //     address indexed cardAddr,
-        //     uint32 indexed facilityIp,
-        //     string cardId,
-        //     string dong,
-        //     string ho,
-        //     string facilityName
-        // );
 
         // 이력 저장
         emit AccessHistory(
@@ -195,9 +186,4 @@ contract Bridge {
         );
         return true;
     }
-    // function transfer(address payable _to, uint256 _value) public {
-    //     assert(isValidCard(_to));
-    //     _to.transfer(_value);
-    //     emit transferEvent(msg.sender, _to, _value);
-    // }
 }
