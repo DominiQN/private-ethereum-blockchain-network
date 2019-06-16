@@ -10,7 +10,7 @@ pragma solidity ^0.5.8;
 pragma experimental ABIEncoderV2;
 
 contract Bridge {
-    string public name; // 토큰 이름
+    string public tokenName; // 토큰 이름
     string public symbol; // 토큰 단위
     uint8 public decimals; // 소수점 이하 자릿수
     uint256 public totalSupply; // 토큰 총량
@@ -60,7 +60,7 @@ contract Bridge {
        // (3) 생성자
     constructor (uint256 _supply, string memory _name, string memory _symbol, uint8 _decimals) public {
         balanceOf[msg.sender] = _supply;
-        name = _name;
+        tokenName = _name;
         symbol = _symbol;
         decimals = _decimals;
         totalSupply = _supply;
@@ -119,7 +119,13 @@ contract Bridge {
         return getCardSize();
     }
 
-    function getCardInfo(address givenAddr) public view returns(address addr, string memory id, string memory status, string memory dong, string memory ho) {
+    function getCardInfo(address givenAddr) public view returns(
+        address addr,
+        string memory id,
+        string memory status,
+        string memory dong,
+        string memory ho
+    ) {
         Card memory card = cards[givenAddr];
         require(!equals(card.id, ""), "There is no card");
         addr = card.addr;
@@ -170,11 +176,13 @@ contract Bridge {
         statuses = new string[](currentPageSize);
         dongs = new string[](currentPageSize);
         hos = new string[](currentPageSize);
+        Card memory currentCard;
         for(uint i = 0; i < currentPageSize; i++) {
-            ids[i] = cards[cardKeys[i + cursor]].id;
-            statuses[i] = statusToString[uint8(cards[cardKeys[i + cursor]].status)];
-            dongs[i] = cards[cardKeys[i + cursor]].dong;
-            hos[i] = cards[cardKeys[i + cursor]].ho;
+            currentCard = cards[cardKeys[i + cursor]];
+            ids[i] = currentCard.id;
+            statuses[i] = statusToString[uint8(currentCard.status)];
+            dongs[i] = currentCard.dong;
+            hos[i] = currentCard.ho;
         }
     }
 
