@@ -6,6 +6,26 @@
 
 // "0xdd870fa1b7c4700f2bd7f44238821c26f7392148","da00004","NORMAL","101","103"
 
+//    ip: '192.168.100.20', 3232261140
+//    name: 'GX룸',         NORMAL
+//    "3232261140","gx_room","NORMAL"
+
+//    ip: '192.168.100.21', 3232261141
+//    name: '피트니스 센터', NORMAL
+//    "3232261141","fitness_center","NORMAL"
+
+//    ip: '192.168.100.22', 3232261142
+//    name: '사우나',       NORMAL
+//    "3232261142","sauna","SUSPENDED"
+
+//    ip: '192.168.100.23', 3232261143
+//    name: '수영장',       NORMAL
+//    "3232261143","swimming_pool","NORMAL"
+
+// addAuth
+// "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c",["3232261140", "3232261141", "3232261142"]
+// 
+
 pragma solidity ^0.5.8;
 pragma experimental ABIEncoderV2;
 
@@ -86,13 +106,22 @@ contract Bridge {
         facilitysLength++;
     }
 
-    function createFacility(uint32 ip, string memory name, string memory status) public {
+    function getFacilitySize() public view returns(uint cardSize) {
+        cardSize = facilitysLength;
+    }
+
+    function getFacilityKeys() public view returns(uint32[] memory) {
+        return facilityKeys;
+    }
+
+    function createFacility(uint32 ip, string memory name, string memory status) public returns(uint) {
         Facility memory facility = facilitys[ip];
         require(facility.ip == 0, "ip already exists");
         Status stat = stringToStatus[status];
         require(stat != Status.UNDEFINED, "invalid status");
         addFacility(ip, name, stat);
         emit SetFacility(ip, name, status);
+        return getFacilitySize();
     }
 
     function getFacilityInfo(uint32 givenIp) public view returns(uint32 ip, string memory name, string memory status) {
@@ -101,6 +130,40 @@ contract Bridge {
         ip = facility.ip;
         name = facility.name;
         status = statusToString[uint8(facility.status)];
+    }
+
+    function getFacilityList(uint size, uint page) public view returns(
+        uint32[] memory ips,
+        string[] memory names,
+        string[] memory statuses,
+        uint lastPage,
+        uint currentPageSize
+    ) {
+        require(size > 0, "'size' must be greater than zero.");
+        uint lastPageSize;
+        uint cursor;
+        // pagination을 위해 제수에 1을 빼고 나머지에 1을 더한다.
+        (lastPage, lastPageSize) = divide(facilitysLength - 1, size);
+        lastPageSize++;
+
+        require(page <= lastPage, "'page' must be less than last page");
+
+        cursor = page * size;
+        if (page == lastPage) {
+            currentPageSize = lastPageSize;
+        } else {
+            currentPageSize = size;
+        }
+        ips = new uint32[](currentPageSize);
+        names = new string[](currentPageSize);
+        statuses = new string[](currentPageSize);
+        Facility memory currentFacility;
+        for(uint i = 0; i < currentPageSize; i++) {
+            currentFacility = facilitys[facilityKeys[i + cursor]];
+            ips[i] = currentFacility.ip;
+            names[i] = currentFacility.name;
+            statuses[i] = statusToString[uint8(currentFacility.status)];
+        }
     }
 
     function addCard(address addr, string memory id, Status status, string memory dong, string memory ho) private {
