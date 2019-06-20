@@ -1,25 +1,31 @@
+const uri = 'ws://175.207.46.3:8546'
+
+const contractAddr = '0xd093a3c46439480d176bc25f189de42ff6e4a73e'
+
+const defaultAccount = '0xa107aa8103ebfa0f79c054bdb470ddc7e4474651'
+
 const abi = [
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "ip",
-				"type": "uint32"
+				"name": "addr",
+				"type": "address"
 			},
 			{
-				"name": "name",
-				"type": "string"
+				"name": "facilityIp",
+				"type": "bytes32"
 			},
 			{
-				"name": "status",
-				"type": "string"
+				"name": "accessTimestamp",
+				"type": "uint256"
 			}
 		],
-		"name": "createFacility",
+		"name": "access",
 		"outputs": [
 			{
-				"name": "",
-				"type": "uint256"
+				"name": "isAuthorized",
+				"type": "bool"
 			}
 		],
 		"payable": false,
@@ -27,87 +33,14 @@ const abi = [
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "addr",
-				"type": "address"
-			}
-		],
-		"name": "getCardAuth",
-		"outputs": [
-			{
-				"name": "ips",
-				"type": "uint32[]"
-			},
-			{
-				"name": "names",
-				"type": "string[]"
-			},
-			{
-				"name": "size",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getCardSize",
-		"outputs": [
-			{
-				"name": "cardSize",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"constant": false,
 		"inputs": [
 			{
 				"name": "addr",
 				"type": "address"
-			},
-			{
-				"name": "auth",
-				"type": "uint32[]"
 			}
 		],
-		"name": "updateCardAuth",
+		"name": "clearAuth",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
@@ -122,72 +55,303 @@ const abi = [
 			},
 			{
 				"name": "id",
-				"type": "string"
+				"type": "bytes32"
 			},
 			{
 				"name": "status",
-				"type": "string"
+				"type": "bytes32"
 			},
 			{
 				"name": "dong",
-				"type": "string"
+				"type": "bytes32"
 			},
 			{
 				"name": "ho",
-				"type": "string"
+				"type": "bytes32"
 			}
 		],
 		"name": "createCard",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
+		"constant": false,
 		"inputs": [
 			{
-				"name": "givenIp",
-				"type": "uint32"
-			}
-		],
-		"name": "getFacilityInfo",
-		"outputs": [
-			{
 				"name": "ip",
-				"type": "uint32"
+				"type": "bytes32"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "bytes32"
 			},
 			{
 				"name": "status",
-				"type": "string"
+				"type": "bytes32"
 			}
 		],
+		"name": "createFacility",
+		"outputs": [],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "tokenName",
-		"outputs": [
+		"constant": false,
+		"inputs": [
 			{
-				"name": "",
-				"type": "string"
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"name": "auth",
+				"type": "bytes32[]"
 			}
 		],
+		"name": "updateAuth",
+		"outputs": [],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "dong",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "ho",
+				"type": "bytes32"
+			}
+		],
+		"name": "getCardEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "dong",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "ho",
+				"type": "bytes32"
+			}
+		],
+		"name": "setCardSuccessEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "dong",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "ho",
+				"type": "bytes32"
+			}
+		],
+		"name": "setCardFailureEvent",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ip",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "name",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "bytes32"
+			}
+		],
+		"name": "setFacility",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "clearCardAuth",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "auth",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "updateCardAuth",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "accessTimestamp",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "cardAddr",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "facilityIp",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "cardId",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "dong",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "ho",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "facilityName",
+				"type": "bytes32"
+			}
+		],
+		"name": "successHistory",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "accessTimestamp",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"name": "cardAddr",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "facilityIp",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "cardId",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "dong",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "ho",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "facilityName",
+				"type": "bytes32"
+			}
+		],
+		"name": "failureHistory",
+		"type": "event"
 	},
 	{
 		"constant": true,
@@ -212,31 +376,54 @@ const abi = [
 		"constant": true,
 		"inputs": [
 			{
-				"name": "givenAddr",
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "getCardAuth",
+		"outputs": [
+			{
+				"name": "ips",
+				"type": "bytes32[]"
+			},
+			{
+				"name": "names",
+				"type": "bytes32[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "addr",
 				"type": "address"
 			}
 		],
 		"name": "getCardInfo",
 		"outputs": [
 			{
-				"name": "addr",
+				"name": "",
 				"type": "address"
 			},
 			{
-				"name": "id",
-				"type": "string"
+				"name": "",
+				"type": "bytes32"
 			},
 			{
-				"name": "status",
-				"type": "string"
+				"name": "",
+				"type": "bytes32"
 			},
 			{
-				"name": "dong",
-				"type": "string"
+				"name": "",
+				"type": "bytes32"
 			},
 			{
-				"name": "ho",
-				"type": "string"
+				"name": "",
+				"type": "bytes32"
 			}
 		],
 		"payable": false,
@@ -245,41 +432,24 @@ const abi = [
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"name": "size",
-				"type": "uint256"
-			},
-			{
-				"name": "page",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"name": "getCardList",
 		"outputs": [
 			{
 				"name": "ids",
-				"type": "string[]"
+				"type": "bytes32[]"
 			},
 			{
 				"name": "statuses",
-				"type": "string[]"
+				"type": "bytes32[]"
 			},
 			{
 				"name": "dongs",
-				"type": "string[]"
+				"type": "bytes32[]"
 			},
 			{
 				"name": "hos",
-				"type": "string[]"
-			},
-			{
-				"name": "lastPage",
-				"type": "uint256"
-			},
-			{
-				"name": "currentPageSize",
-				"type": "uint256"
+				"type": "bytes32[]"
 			}
 		],
 		"payable": false,
@@ -288,54 +458,25 @@ const abi = [
 	},
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "symbol",
+		"inputs": [
+			{
+				"name": "ip",
+				"type": "bytes32"
+			}
+		],
+		"name": "getFacilityInfo",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getFacilitySize",
-		"outputs": [
-			{
-				"name": "cardSize",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "addr",
-				"type": "address"
-			}
-		],
-		"name": "clearAuth",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getFacilityKeys",
-		"outputs": [
+				"type": "bytes32"
+			},
 			{
 				"name": "",
-				"type": "uint32[]"
+				"type": "bytes32"
+			},
+			{
+				"name": "",
+				"type": "bytes32"
 			}
 		],
 		"payable": false,
@@ -343,65 +484,21 @@ const abi = [
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"name": "facilityIp",
-				"type": "uint32"
-			},
-			{
-				"name": "accessTimestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "access",
-		"outputs": [
-			{
-				"name": "authorized",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"constant": true,
-		"inputs": [
-			{
-				"name": "size",
-				"type": "uint256"
-			},
-			{
-				"name": "page",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"name": "getFacilityList",
 		"outputs": [
 			{
 				"name": "ips",
-				"type": "uint32[]"
+				"type": "bytes32[]"
 			},
 			{
 				"name": "names",
-				"type": "string[]"
+				"type": "bytes32[]"
 			},
 			{
 				"name": "statuses",
-				"type": "string[]"
-			},
-			{
-				"name": "lastPage",
-				"type": "uint256"
-			},
-			{
-				"name": "currentPageSize",
-				"type": "uint256"
+				"type": "bytes32[]"
 			}
 		],
 		"payable": false,
@@ -410,155 +507,24 @@ const abi = [
 	},
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "getCardKeys",
+		"inputs": [
+			{
+				"name": "_to",
+				"type": "address"
+			}
+		],
+		"name": "isValidCard",
 		"outputs": [
 			{
 				"name": "",
-				"type": "address[]"
+				"type": "bool"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"name": "_supply",
-				"type": "uint256"
-			},
-			{
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"name": "_symbol",
-				"type": "string"
-			},
-			{
-				"name": "_decimals",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "id",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "status",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "dong",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "ho",
-				"type": "string"
-			}
-		],
-		"name": "SetCard",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "ip",
-				"type": "uint32"
-			},
-			{
-				"indexed": false,
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "status",
-				"type": "string"
-			}
-		],
-		"name": "SetFacility",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "ip",
-				"type": "uint32"
-			}
-		],
-		"name": "AddCardAuth",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"name": "timestamp",
-				"type": "uint256"
-			},
-			{
-				"indexed": true,
-				"name": "cardAddr",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "facilityIp",
-				"type": "uint32"
-			},
-			{
-				"indexed": false,
-				"name": "cardId",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "dong",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "ho",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "facilityName",
-				"type": "string"
-			}
-		],
-		"name": "AccessHistory",
-		"type": "event"
 	}
 ]
 
 
-export { contractAddr, abi, defaultAccount }
+export { uri, contractAddr, abi, defaultAccount }
