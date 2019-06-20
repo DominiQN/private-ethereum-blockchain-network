@@ -141,7 +141,7 @@ const ApiUtil = {
     ApiUtil.unlockAccount(defaultAccount, 'bridge').then(() => {
       console.log('unlock getCardAuth')
       contract.methods.getCardAuth(addr).call().then(res => {
-        const authList = []
+        let authList = []
         for (let i in res.ips) {
           authList.push({
             ip: ApiUtil.bytes32ToString(res.ips[i]),
@@ -154,6 +154,7 @@ const ApiUtil = {
             [cur.ip]: true,
           }), {})
         console.log('getCardAuth')
+        console.log(authInfo)
         getCallback(authInfo)
       })
     })

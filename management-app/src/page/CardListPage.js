@@ -45,11 +45,20 @@ function CardListPage() {
   const cardList = useCardList()
   const facilityList = useFacilityList()
   const [cardAuthTarget, setCardAuthTarget] = useState()
-  const [cardAuth, setCardAuth] = useState({})
-
+  const [cardAuthList, setCardAuthList] = useState([])
+  useEffect(() => {
+    if (facilityList > 0) {
+      setCardAuthList(facilityList)
+    }
+  }, [facilityList])
   useEffect(() => {
     if (cardAuthTarget) {
-      ApiUtil.getCardAuth(console.log, cardAuthTarget.addr)
+      ApiUtil.getCardAuth((authInfo) => {
+        setCardAuthList(facilityList.map(facility => ({
+          ...facility,
+          checked: authInfo[facility.ip],
+        })))
+      }, cardAuthTarget.addr)
     }
   }, [cardAuthTarget])
 
@@ -60,19 +69,26 @@ function CardListPage() {
   
   const SelectButtonWrapper = (onClick) => (data) => (
     <Checkbox
-      checked={cardAuth[data.ip]}
-      // onChange={handleChange('checkedA')}
+      checked={data.checked}
+      onChange={() => onClick(data)}
       value="checkedA"
       inputProps={{
         'aria-label': 'primary checkbox',
       }}
     />
   )
-  const onSelectButtonClick = () => {
-
+  const onSelectButtonClick = (data) => {
+    const index = cardAuthList.indexOf(data)
+    setCardAuthList(prev => [...prev.slice(0, index),
+      {...prev[index], checked: !prev[index].checked},
+    ...prev.slice(index + 1)])
   }
   const onUpdate = () => {
-
+    ApiUtil.updateAuth(
+      cardAuthTarget.addr,
+      cardAuthList.filter(facility => facility.checked)
+        .map(facility => facility.ip)
+    )
   }
   return (
     <div style={{ marginTop: 24 }}>
@@ -86,22 +102,24 @@ function CardListPage() {
         open={!!cardAuthTarget}
         onClose={() => {
           setCardAuthTarget(null)
-          setCardAuth([])
+          setCardAuthList([])
         }}
         title="카드 권한 목록"
-      >
-        <GenericTable
-          tableHeader={facilityListTableHeader}
-          dataScheme={facilityListDataScheme}
-          data={facilityList}
-          additionalCells={[SelectButtonWrapper(onSelectButtonClick)]}
-        />
+        buttonComps={
           <Button
             onClick={onUpdate}
             variant="outlined"
           >
             생성
           </Button>
+        }
+      >
+        <GenericTable
+          tableHeader={facilityListTableHeader}
+          dataScheme={facilityListDataScheme}
+          data={cardAuthList}
+          additionalCells={[SelectButtonWrapper(onSelectButtonClick)]}
+        />
       </GenericDialog>
     </div>
   )
