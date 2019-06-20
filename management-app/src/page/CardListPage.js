@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from '@material-ui/core';
+import { Button, Checkbox } from '@material-ui/core';
 import GenericTable from '../component/GenericTable'
 import GenericDialog from '../component/GenericDialog'
-import { mockCardList, mockFacilityList } from '../util/MockDataUtil'
+import ApiUtil from '../util/ApiUtil';
 
 const cardListTableHeader = [
   '카드 ID', '이더리움 계정', '카드 상태', '동', '호', ''
 ]
 const cardListDataScheme = [
-  'id', 'account', 'status', 'dong', 'ho',
+  'id', 'addr', 'status', 'dong', 'ho',
 ]
 
-const cardAuthListTableHeader = [
-  '시설 IP', '이름', '권한 여부',
+const facilityListTableHeader = [
+  '시설 IP', '시설명', ''
 ]
 
-const cardAuthListDataScheme = [
+const facilityListDataScheme = [
   'ip', 'name'
 ]
 
@@ -27,55 +27,81 @@ const ViewButtonWrapper = (onClick) => (data) => (
 
 const useFacilityList = () => {
   const [facilityList, setFacilityList] = useState([])
-  // TODO: set real facility data
   useEffect(() => {
-    setFacilityList(mockFacilityList)
-  }, [facilityList])
+    ApiUtil.getFacilityList(setFacilityList)
+  }, [])
   return facilityList
 }
 
-const useCheckBox = () => {
-  const [checkbox, setCheckbox] = useState([])
-  const [size, setSize] = useState(0)
+const useCardList = () => {
+  const [cardList, setCardList] = useState([])
   useEffect(() => {
-    
-  }, [size])
-  return [checkbox, setSize]
+    ApiUtil.getCardList(setCardList)
+  }, [])
+  return cardList
 }
 
 function CardListPage() {
-  const [openAuthDialog, setOpenAuthDialog] = useState(false)
-  const [cardAuthList, setCardAuthList] = useState([])
-  // const facilityList = useFacilityList()
-  // const [checkBox] = useCheckBox()
+  const cardList = useCardList()
+  const facilityList = useFacilityList()
+  const [cardAuthTarget, setCardAuthTarget] = useState()
+  const [cardAuth, setCardAuth] = useState({})
 
-  // useEffect(() => {
-  //   setSize(facilityList.length)
-  // }, [cardAuthList, facilityList])
+  useEffect(() => {
+    if (cardAuthTarget) {
+      ApiUtil.getCardAuth(console.log, cardAuthTarget.addr)
+    }
+  }, [cardAuthTarget])
 
   const onViewButtonClick = (cardData) => {
-    setCardAuthList(cardData.auth)
-    setOpenAuthDialog(true)
+    setCardAuthTarget(cardData)
+  }
+
+  
+  const SelectButtonWrapper = (onClick) => (data) => (
+    <Checkbox
+      checked={cardAuth[data.ip]}
+      // onChange={handleChange('checkedA')}
+      value="checkedA"
+      inputProps={{
+        'aria-label': 'primary checkbox',
+      }}
+    />
+  )
+  const onSelectButtonClick = () => {
+
+  }
+  const onUpdate = () => {
+
   }
   return (
     <div style={{ marginTop: 24 }}>
       <GenericTable
         tableHeader={cardListTableHeader}
         dataScheme={cardListDataScheme}
-        data={mockCardList}
+        data={cardList}
         additionalCells={[ViewButtonWrapper(onViewButtonClick)]}
       />
       <GenericDialog
-        open={openAuthDialog}
-        onClose={() => setOpenAuthDialog(false)}
+        open={!!cardAuthTarget}
+        onClose={() => {
+          setCardAuthTarget(null)
+          setCardAuth([])
+        }}
         title="카드 권한 목록"
       >
         <GenericTable
-          tableHeader={cardAuthListTableHeader}
-          dataScheme={cardAuthListDataScheme}
-          data={cardAuthList}
-          // additionalCells={}
+          tableHeader={facilityListTableHeader}
+          dataScheme={facilityListDataScheme}
+          data={facilityList}
+          additionalCells={[SelectButtonWrapper(onSelectButtonClick)]}
         />
+          <Button
+            onClick={onUpdate}
+            variant="outlined"
+          >
+            생성
+          </Button>
       </GenericDialog>
     </div>
   )

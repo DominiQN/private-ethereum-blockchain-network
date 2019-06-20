@@ -1,56 +1,71 @@
 import React, { useState, useEffect} from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@material-ui/core';
 import GenericTable from '../component/GenericTable';
-import { mockHistoryData, mockCardList } from '../util/MockDataUtil'
+import { mockHistoryData } from '../util/MockDataUtil'
+import ApiUtil from '../util/ApiUtil';
 
 const tableHeader = [
-  '사용시간', '시설 IP', '시설 이름',
+  '사용시간', '시설 IP', '시설 이름', '이더리움 계정', '카드 ID', '동', '호',
 ]
 
 const dataScheme = [
-  'time', 'ip', 'name',
+  'datetime', 'facilityIp', 'facilityName', 'cardAddr', 'cardId', 'dong', 'ho',
 ]
 
-const useCardHistory = () => {
-  const [card, setCard] = useState()
-  const [cardHistory, setCardHistory] = useState([])
-  function getCardHistory(card) {
-    const historyData = mockHistoryData.find(data => data.account === card.account)
-    return historyData ? historyData.history : []
-  }
+const useCardList = () => {
+  const [cardList, setCardList] = useState([])
   useEffect(() => {
-    if (card && card.account) {
-      setCardHistory(getCardHistory(card))
-    } else {
-      console.warn('no card', card)
+    ApiUtil.getCardList(setCardList)
+  }, [])
+  return cardList
+}
+
+const useCardHistory = (cardList) => {
+  const [filter, setFilter] = useState()
+  const [cardHistory, setCardHistory] = useState([])
+
+  useEffect(() => {
+    if (cardList.length === 0) {
+      return
     }
-  }, [card])
-  return [cardHistory, card, setCard]
+    if (filter) {
+      console.log(filter)
+      ApiUtil.getHistory(setCardHistory, filter.year, filter.month, filter.addr, filter.ip)
+    }
+  }, [cardList, filter])
+  return [cardHistory, setFilter]
 }
 
 function HistoryPage() {
-  const [cardList, setCardList] = useState([])
-  const [cardHistory, card, setCard] = useCardHistory()
+  const cardList = useCardList()
+  const [cardHistory, setFilter] = useCardHistory(cardList)
+  const [card, setCard] = useState()
+  const [year, setYear] = useState(0)
+  const [month, setMonth] = useState(0)
+  const [ip, setIp] = useState('')
   const classes = useStyles()
-
-  console.log('selected', card)
-
-  useEffect(() => {
-    setCardList(mockCardList)
-  }, [])
 
   function onClickCard(e) {
     setCard(e.target.value)
   }
 
-  console.log('cardHistory', cardHistory)
+  function onViewClick() {
+    setFilter({
+      year: year > 0 ? year : null,
+      month: (month > 0 && month <= 12) ? month : null,
+      card: card && card.addr,
+      ip,
+    })
+  }
+
   return (
     <div style={{ marginTop: 24 }}>
-      <form autoComplete="off">
+      <form autoComplete="off" className={classes.form}>
         <FormControl className={classes.form}>
           <InputLabel htmlFor="card-select">카드</InputLabel>
           <Select
+            className={classes.select}
             value={card}
             onChange={onClickCard}
             inputProps={{
@@ -60,9 +75,35 @@ function HistoryPage() {
           >
             <MenuItem value={null}>선택</MenuItem>
             {cardList.map(card => (
-              <MenuItem key={card.account} value={card}>{`${card.id} | ${card.dong}동 ${card.ho}호`}</MenuItem>
+              <MenuItem key={card.addr} value={card}>{`${card.id} | ${card.dong}동 ${card.ho}호`}</MenuItem>
             ))}
           </Select>
+          <TextField
+            id="filter-year"
+            label="연"
+            type="number"
+            className={classes.textfield}
+            value={year}
+            onChange={e => setYear(e.target.value)}
+          />
+          <TextField
+            id="filter-month"
+            label="월"
+            type="number"
+            className={classes.textfield}
+            value={month}
+            onChange={e => setMonth(e.target.value)}
+          />
+          <TextField
+            id="filter-ip"
+            label="IP"
+            className={classes.textfield}
+            value={ip}
+            onChange={e => setIp(e.target.value)}
+          />
+          <Button variant="contained" onClick={onViewClick}>
+            조회
+          </Button>
         </FormControl>
       </form>
       <GenericTable
@@ -78,7 +119,18 @@ const useStyles = makeStyles({
   form: {
     margin: 8,
     minWidth: 150,
-  }
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  select: {
+    minWidth: 300,
+  },
+  textfield: {
+    marginLeft: 8,
+    marginRight: 8,
+    minWidth: 200,
+    maxWidth: 500,
+  },
 })
 
 export default HistoryPage

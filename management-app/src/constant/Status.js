@@ -1,6 +1,6 @@
-const CardStatus = {
+const Status = {
   NORMAL: 'NORMAL',
   SUSPENDED: 'SUSPENDED',
 }
 
-export default CardStatus
+export default Status

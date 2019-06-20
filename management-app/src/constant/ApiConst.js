@@ -1,6 +1,6 @@
 const uri = 'ws://175.207.46.3:8546'
 
-const contractAddr = '0xd093a3c46439480d176bc25f189de42ff6e4a73e'
+const contractAddr = '0x68d70756c7aa9017c2ea752a9503b4bd9ce67ed7'
 
 const defaultAccount = '0xa107aa8103ebfa0f79c054bdb470ddc7e4474651'
 
@@ -19,6 +19,10 @@ const abi = [
 			{
 				"name": "accessTimestamp",
 				"type": "uint256"
+			},
+			{
+				"name": "yearMonth",
+				"type": "bytes32"
 			}
 		],
 		"name": "access",
@@ -183,7 +187,7 @@ const abi = [
 				"type": "bytes32"
 			}
 		],
-		"name": "setCardSuccessEvent",
+		"name": "setCardSuccess",
 		"type": "event"
 	},
 	{
@@ -215,7 +219,7 @@ const abi = [
 				"type": "bytes32"
 			}
 		],
-		"name": "setCardFailureEvent",
+		"name": "setCardFailure",
 		"type": "event"
 	},
 	{
@@ -237,7 +241,29 @@ const abi = [
 				"type": "bytes32"
 			}
 		],
-		"name": "setFacility",
+		"name": "setFacilitySuccess",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "ip",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "name",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "bytes32"
+			}
+		],
+		"name": "setFacilityFailure",
 		"type": "event"
 	},
 	{
@@ -274,8 +300,8 @@ const abi = [
 		"inputs": [
 			{
 				"indexed": true,
-				"name": "accessTimestamp",
-				"type": "uint256"
+				"name": "yearMonth",
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -286,6 +312,11 @@ const abi = [
 				"indexed": true,
 				"name": "facilityIp",
 				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "timestamp",
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
@@ -316,8 +347,8 @@ const abi = [
 		"inputs": [
 			{
 				"indexed": true,
-				"name": "accessTimestamp",
-				"type": "uint256"
+				"name": "yearMonth",
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -328,6 +359,11 @@ const abi = [
 				"indexed": true,
 				"name": "facilityIp",
 				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "timestamp",
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
@@ -348,6 +384,11 @@ const abi = [
 				"indexed": false,
 				"name": "facilityName",
 				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "failureCode",
+				"type": "uint32"
 			}
 		],
 		"name": "failureHistory",
@@ -435,6 +476,10 @@ const abi = [
 		"inputs": [],
 		"name": "getCardList",
 		"outputs": [
+			{
+				"name": "addrs",
+				"type": "address[]"
+			},
 			{
 				"name": "ids",
 				"type": "bytes32[]"
@@ -525,6 +570,5 @@ const abi = [
 		"type": "function"
 	}
 ]
-
 
 export { uri, contractAddr, abi, defaultAccount }

@@ -13,7 +13,10 @@ const useStyles = makeStyles({
     width: Styles.drawerWidth,
   },
   menuItem: {
-
+    backgroundColor: 'grey',
+  },
+  menuItemText: {
+    color: 'white',
   },
   nestedMenuItem: {
     paddingLeft: 24,
@@ -33,7 +36,7 @@ function MainDrawer({ selected, onItemClick }) {
       <AppBarSpacer />
       <List>
         <ListItem className={classes.menuItem}>
-          <ListItemText primary="카드 관리" />
+          <ListItemText className={classes.menuItemText} primary="카드 관리" />
         </ListItem>
         <ListItem
           button
@@ -55,7 +58,7 @@ function MainDrawer({ selected, onItemClick }) {
         <Divider />
 
         <ListItem className={classes.menuItem}>
-          <ListItemText primary="이력 관리" />
+          <ListItemText className={classes.menuItemText} primary="이력 관리" />
         </ListItem>
         <ListItem
           button

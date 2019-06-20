@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Paper, TextField, Button } from '@material-ui/core'
-import GenericTable from '../component/GenericTable'
 import ApiUtil from '../util/ApiUtil'
-import { mockFacilityList } from '../util/MockDataUtil'
-
-const useFacilityList = () => {
-  const [facilityList, setFacilityList] = useState([])
-  useEffect(() => {
-    setFacilityList(mockFacilityList)
-  }, [])
-  return facilityList
-}
 
 function CardCreatePage() {
   const classes = useStyles()
-  const facilityList = useFacilityList()
+  const [cardId, setCardId] = useState('')
+  const [dong, setDong] = useState('')
+  const [ho, setHo] = useState('')
 
   function onSubmit() {
-    ApiUtil.createAccount()
+    if (cardId && dong && ho) {
+      ApiUtil.createCard(cardId, dong, ho)
+    } else {
+      console.warn('cannot create card', cardId, dong, ho)
+    }
+  }
+
+  function onSelectButtonClick() {
+
   }
   return (
     <Paper className={classes.paper}>
@@ -37,46 +37,30 @@ function CardCreatePage() {
             id="card-id"
             label="카드 ID"
             className={classes.textfield}
-          />
-          <TextField
-            id="card-status"
-            label="카드 상태"
-            className={classes.textfield}
+            value={cardId}
+            onChange={e => setCardId(e.target.value)}
           />
           <div className={classes.dongHo}>
             <TextField
               id="card-dong"
               label="동"
               className={classes.textfield}
+              value={dong}
+              onChange={e => setDong(e.target.value)}
             />
             <TextField
               id="card-ho"
               label="호"
               className={classes.textfield}
+              value={ho}
+              onChange={e => setHo(e.target.value)}
             />
           </div>
         </div>
-        <div className={classes.tableContainer}>
-          <GenericTable
-            tableHeader={facilityListTableHeader}
-            dataScheme={facilityListDataScheme}
-            data={facilityList}
-            // additionalCells={}
-          />
-        </div>
-        
       </form>
     </Paper>
   )
 }
-
-const facilityListTableHeader = [
-  '시설 IP', '시설명', ''
-]
-
-const facilityListDataScheme = [
-  'ip', 'name'
-]
 
 const useStyles = makeStyles({
   paper: {
@@ -88,10 +72,7 @@ const useStyles = makeStyles({
   },
   buttonContainer: {
     display: 'flex',
-    flexDirection: 'row-reverse',
-  },
-  createButton: {
-
+    flexDirection: 'row',
   },
   textContainer: {
     display: 'flex',
