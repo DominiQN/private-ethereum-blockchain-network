@@ -54,7 +54,7 @@ function HistoryPage() {
     setFilter({
       year: year > 0 ? year : null,
       month: (month > 0 && month <= 12) ? month : null,
-      card: card && card.addr,
+      addr: card && card.addr,
       ip,
     })
   }
