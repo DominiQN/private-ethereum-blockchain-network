@@ -77,6 +77,25 @@ const ApiUtil = {
       })
     })
   },
+  listenCreateCardEvent: (id, successCallback, failureCallback) => {
+    contract.once('setCardSuccess', {
+      filter: { id },
+      fromBlock: 0,
+    }, (error, event) => {
+      const card = {
+        addr: event.returnValues.addr,
+        id: ApiUtil.bytes32ToString(event.returnValues.id),
+        dong: ApiUtil.bytes32ToString(event.returnValues.dong),
+        ho: ApiUtil.bytes32ToString(event.returnValues.ho),
+        status: ApiUtil.bytes32ToString(event.returnValues.status),
+      }
+      successCallback(card)
+    })
+    contract.once('setCardFailure', {
+      filter: { id },
+      fromBlock: 0,
+    }, (error, event) => failureCallback())
+  },
   getCardList: (getCallback = (res) => {}) => {
     ApiUtil.unlockAccount(defaultAccount, 'bridge').then(() => {
       console.log('unlock getCardList')
@@ -152,7 +171,6 @@ const ApiUtil = {
         .then(res => console.log(res))
     })
   },
-
   getHistory: (getCallback = () => {}, year, month, addr, ip) => {
     const filter = {}
     if (year && month) {

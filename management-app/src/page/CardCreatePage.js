@@ -1,17 +1,35 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Paper, TextField, Button } from '@material-ui/core'
+import { Paper, TextField, Button, LinearProgress } from '@material-ui/core'
 import ApiUtil from '../util/ApiUtil'
+import GenericDialog from '../component/GenericDialog';
 
 function CardCreatePage() {
   const classes = useStyles()
   const [cardId, setCardId] = useState('')
   const [dong, setDong] = useState('')
   const [ho, setHo] = useState('')
+  const [isLoading, setLoading] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [resultMessage, setResultMessage] = useState()
+
+  useEffect(() => {
+    if (isLoading) {
+      ApiUtil.listenCreateCardEvent(cardId, (event) => {
+        setResultMessage('카드 생성 성공')
+        setLoading(false)
+      }, () => {
+        setResultMessage('카드 생성 실패')
+        setLoading(false)
+      })
+    }
+  }, [isLoading])
 
   function onSubmit() {
     if (cardId && dong && ho) {
       ApiUtil.createCard(cardId, dong, ho)
+      setOpenDialog(true)
+      setLoading(true)
     } else {
       console.warn('cannot create card', cardId, dong, ho)
     }
@@ -58,6 +76,21 @@ function CardCreatePage() {
           </div>
         </div>
       </form>
+      <GenericDialog
+        title={isLoading ? '카드 생성 중' : '완료'}
+        open={openDialog}
+        buttonComps={!isLoading && (<Button
+          onClick={() => setOpenDialog(false)}
+        >
+          닫기
+        </Button>)}
+      >
+        {isLoading
+         ? (<LinearProgress />)
+         : resultMessage
+        }
+
+      </GenericDialog>
     </Paper>
   )
 }
