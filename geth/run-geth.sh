@@ -44,7 +44,7 @@ then
         "eip158Block": 0
     },
     "difficulty": "0x10",
-    "gasLimit": "0x2fefd8",
+    "gasLimit": "0x10000000",
     "alloc": {},
     "coinbase": "0x0000000000000000000000000000000000000000",
     "extraData": "",
@@ -70,7 +70,7 @@ EOF
     docker run --name ethereum-node \
             -it \
             --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
-            -p 8545:8545 -p 30303:30303 \
+            -p 8545:8545 -p 30303:30303 -p 8546:8546 \
             ethereum/client-go:stable \
             --rpc \
             --rpcaddr "0.0.0.0" \
@@ -78,7 +78,7 @@ EOF
             --rpccorsdomain "*" \
             --ws \
             --wsaddr "0.0.0.0" \
-            --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
+            --wsapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
             --wsorigins "*" \
             --datadir /root \
             --networkid $CHAINID \
@@ -88,4 +88,22 @@ else
 
 fi
 
-    # enode://d73598abfbe614546d56b31600265115749fe1191c07e87a69797dc556c3fd23aae8165a07956d8a51675835fa4367fec9bdd6a0557701073b01d3ada009183e@192.168.0.53:30303?discport=4618
+    # "enode://10ebeb9d7552b02448cad167daeb89fd50fb64e4332c7452be92c694eec1f7f8af0a044c91ea6b6175e63930da60b05d92bc495187677fc041231939a7907ccd@192.168.0.52:30303"
+    # "enode://cfeaa863248d8d966be6bc2d324c247fcf24c5b01ed0fe2245e0a637422f787976d742a3cd565a67a34e2478a02fea5c8281e7b01f64477c1afbf0b4b15a9ebb@192.168.0.53:30303?discport=5636"
+
+        docker run --name ethereum-node \
+            -it \
+            --mount type=bind,source=/var/dockerstorage/ethereum,target=/root \
+            -p 8545:8545 -p 30303:30303 -p 8546:8546 \
+            ethereum/client-go:stable \
+            --rpc \
+            --rpcaddr "0.0.0.0" \
+            --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
+            --rpccorsdomain "*" \
+            --ws \
+            --wsaddr "0.0.0.0" \
+            --wsapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" \
+            --wsorigins "*" \
+            --datadir /root \
+            --networkid 85183515 \
+            console

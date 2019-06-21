@@ -79,7 +79,7 @@ const ApiUtil = {
   },
   listenCreateCardEvent: (id, successCallback, failureCallback) => {
     contract.once('setCardSuccess', {
-      filter: { id },
+      filter: { id: ApiUtil.stringToBytes32(id) },
       fromBlock: 0,
     }, (error, event) => {
       const card = {
@@ -92,7 +92,7 @@ const ApiUtil = {
       successCallback(card)
     })
     contract.once('setCardFailure', {
-      filter: { id },
+      filter: { id: ApiUtil.stringToBytes32(id) },
       fromBlock: 0,
     }, (error, event) => failureCallback())
   },
@@ -172,6 +172,68 @@ const ApiUtil = {
         .then(res => console.log(res))
     })
   },
+  listenAccess: (addr, ip, successCallback, failureCallback) => {
+    const filter = { cardAddr: addr, facilityIp: ApiUtil.stringToBytes32(ip) }
+    console.log('filter', filter)
+    contract.once('successHistory', {
+      filter,
+      fromBlock: 0,
+    }, (error, event) => {
+      console.log('access success!')
+      const history = {
+        datetime: new Date(parseInt(event.returnValues.timestamp)).toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+        }),
+        cardAddr: event.returnValues.cardAddr,
+        cardId: ApiUtil.bytes32ToString(event.returnValues.cardId),
+        dong: ApiUtil.bytes32ToString(event.returnValues.dong),
+        ho: ApiUtil.bytes32ToString(event.returnValues.ho),
+        facilityIp: ApiUtil.bytes32ToString(event.returnValues.facilityIp),
+        facilityName: ApiUtil.bytes32ToString(event.returnValues.facilityName),
+      }
+      successCallback(history)
+    })
+
+    contract.once('failureHistory', {
+      fromBlock: 0,
+    }, (error, event) => {
+      console.error('error', error)
+      console.warn('access failure!')
+      const history = {
+        datetime: new Date(parseInt(event.returnValues.timestamp)).toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+        }),
+        cardAddr: event.returnValues.cardAddr,
+        cardId: ApiUtil.bytes32ToString(event.returnValues.cardId),
+        dong: ApiUtil.bytes32ToString(event.returnValues.dong),
+        ho: ApiUtil.bytes32ToString(event.returnValues.ho),
+        facilityIp: ApiUtil.bytes32ToString(event.returnValues.facilityIp),
+        facilityName: ApiUtil.bytes32ToString(event.returnValues.facilityName),
+        failureCode: event.returnValues.failureCode,
+      }
+      switch (history.failureCode) {
+        case 1: history.failureCode = `존재하지 않는 카드입니다.\naddress: ${addr}`
+          break
+        case 2: history.failureCode = `정지된 카드입니다.\naddress: ${addr}`
+          break
+        case 3: history.failureCode = `존재하지 않는 시설이거나, 권한이 없습니다.\naddress: ${addr}, ip: ${ip}`
+          break
+        default: history.failureCode = `알 수 없는 코드입니다.\n${history.failureCode}`
+      }
+      console.log(history)
+      failureCallback(history)
+    })
+  },
   getHistory: (getCallback = () => {}, year, month, addr, ip) => {
     const filter = {}
     if (year && month) {
@@ -215,23 +277,8 @@ const ApiUtil = {
     })
   },
 
-  web3Test: async () => {
-    // const ip = ApiUtil.stringToBytes32('192.168.100.21')
-    // const name = ApiUtil.stringToBytes32('sauna')
-    // const status = ApiUtil.stringToBytes32('NORMAL')
-    // ApiUtil.updateAuth('0xb60d95e2bdb16b46d7156563f7e101be71699a6a', ['192.168.100.20'])
-
-    // ApiUtil.access(
-    //   '0xF175Ba9Bd3FCd078C97D2834c592C9e6Cde3f80f', '192.168.0.20'
-    // )
-    // ApiUtil.updateAuth('0xF175Ba9Bd3FCd078C97D2834c592C9e6Cde3f80f', ['192.168.0.20'])
-    // ApiUtil.createCard('da00002', '101', '101')
-    // ApiUtil.createFacility('192.168.0.20', 'gx_room')
-    // ApiUtil.createFacility('192.168.0.21', 'sauna')
-    // ApiUtil.getCardList(console.log)
+  web3Test: () => {
     // ApiUtil.getFacilityList(console.log)
-
-    ApiUtil.getHistory(console.log, 2019, 7)
   },
 }
 

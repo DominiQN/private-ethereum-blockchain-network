@@ -6,7 +6,7 @@
         "eip158Block": 0
     },
     "difficulty": "0x10",
-    "gasLimit": "0x2fefd8",
+    "gasLimit": "0x10000000",
     "alloc": {},
     "coinbase": "0x0000000000000000000000000000000000000000",
     "extraData": "",

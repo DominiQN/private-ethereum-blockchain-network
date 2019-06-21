@@ -8,6 +8,8 @@ import HistoryPage from './HistoryPage'
 import Styles from '../constant/Styles';
 import TitleBar from '../component/TitleBar';
 import { mockCardList } from '../util/MockDataUtil'
+import CardReaderPage from './CardReaderPage';
+import ApiUtil from '../util/ApiUtil';
 
 const MockContext = React.createContext({
   cardList: mockCardList,
@@ -32,6 +34,7 @@ function Main() {
       <CardListPage title={title} />,
       <CardCreatePage title={title} />,
       <HistoryPage title={title} />,
+      <CardReaderPage title={title} />,
     ]
     return pageList[index]
   }

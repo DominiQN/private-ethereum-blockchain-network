@@ -69,6 +69,19 @@ function MainDrawer({ selected, onItemClick }) {
           <ListItemText primary="이력 조회" />
         </ListItem>
         
+        <Divider />
+
+        <ListItem className={classes.menuItem}>
+          <ListItemText className={classes.menuItemText} primary="유틸" />
+        </ListItem>
+        <ListItem
+          button
+          selected={selected === 3}
+          onClick={() => onItemClick(3, "카드 리더기")}
+          className={classes.nestedMenuItem}
+        >
+          <ListItemText primary="카드 리더기" />
+        </ListItem>
       </List>
     </Drawer>
   )

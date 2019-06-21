@@ -110,7 +110,7 @@ function CardListPage() {
             onClick={onUpdate}
             variant="outlined"
           >
-            생성
+            권한 수정
           </Button>
         }
       >

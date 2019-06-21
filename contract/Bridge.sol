@@ -30,29 +30,32 @@ contract Bridge {
 
     // log events
     event getCardEvent(address addr, bytes32 id, bytes32 status, bytes32 dong, bytes32 ho);
-    event setCardSuccess(address addr, bytes32 id, bytes32 status, bytes32 dong, bytes32 ho);
-    event setCardFailure(address addr, bytes32 id, bytes32 status, bytes32 dong, bytes32 ho);
-    event setFacilitySuccess(bytes32 ip, bytes32 name, bytes32 status);
-    event setFacilityFailure(bytes32 ip, bytes32 name, bytes32 status);
-    event clearCardAuth(address addr);
-    event updateCardAuth(address addr, bytes32[] auth);
+    event setCardSuccess(address addr, bytes32 indexed id, bytes32 status, bytes32 dong, bytes32 ho);
+    event setCardFailure(address addr, bytes32 indexed id, bytes32 status, bytes32 dong, bytes32 ho);
+    event setFacilitySuccess(bytes32 indexed ip, bytes32 name, bytes32 status);
+    event setFacilityFailure(bytes32 indexed ip, bytes32 name, bytes32 status);
+    event clearCardAuth(address indexed addr);
+    event updateCardAuth(address indexed addr, bytes32[] auth);
     event successHistory(
-        uint256 indexed accessTimestamp,
+        bytes32 indexed yearMonth,
         address indexed cardAddr,
         bytes32 indexed facilityIp,
+        uint256 timestamp,
         bytes32 cardId,
         bytes32 dong,
         bytes32 ho,
         bytes32 facilityName
     );
     event failureHistory(
-        uint256 indexed accessTimestamp,
+        bytes32 indexed yearMonth,
         address indexed cardAddr,
         bytes32 indexed facilityIp,
+        uint256 timestamp,
         bytes32 cardId,
         bytes32 dong,
         bytes32 ho,
-        bytes32 facilityName
+        bytes32 facilityName,
+        uint32 failureCode
     );
 
        // (3) 생성자
@@ -179,16 +182,22 @@ contract Bridge {
         updateCardAuth(addr, auth);
     }
     
-    function access(address addr, bytes32 facilityIp, uint256 accessTimestamp) public returns(bool isAuthorized) {
+    function access(address addr, bytes32 facilityIp, uint256 accessTimestamp, bytes32 yearMonth) public returns(bool isAuthorized) {
         Card memory card = cards[addr];
-        Facility memory facility = cards[addr].auth[facilityIp];
-        if (card.addr != address(0) && card.status == normal && facility.ip != bytes32(0)) {
-            successHistory(accessTimestamp, card.addr, facility.ip, card.id, card.dong, card.ho, facility.name);
-            return true;
-        }
-        else {
-            failureHistory(accessTimestamp, card.addr, facility.ip, card.id, card.dong, card.ho, facility.name);
+        if (card.addr == address(0)) {
+            failureHistory(yearMonth, addr, facilityIp, accessTimestamp, card.id, card.dong, card.ho, facility.name, 1);
             return false;
         }
+        if (card.status != normal) {
+            failureHistory(yearMonth, addr, facilityIp, accessTimestamp, card.id, card.dong, card.ho, facility.name, 2);
+            return false;
+        }
+        Facility memory facility = cards[addr].auth[facilityIp];
+        if (facility.ip == bytes32(0)) {
+            failureHistory(yearMonth, addr, facilityIp, accessTimestamp, card.id, card.dong, card.ho, facility.name, 3);
+            return false;
+        }
+        successHistory(yearMonth, addr, facilityIp, accessTimestamp, card.id, card.dong, card.ho, facility.name);
+        return true;
     }
 }
