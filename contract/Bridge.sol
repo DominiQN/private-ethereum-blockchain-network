@@ -172,14 +172,19 @@ contract Bridge {
         clearCardAuth(addr);
     }
     
-    function updateAuth(address addr, bytes32[] memory auth) public {
-        Facility memory currentFacility;
-        for(uint i = 0; i < auth.length; i++) {
-            currentFacility = facilitys[auth[i]];
-            require(currentFacility.ip != 0);
-            cards[addr].auth[auth[i]] = currentFacility;
+    function updateAuth(address addr, bytes32[] memory ips) public {
+        uint i;
+        for(i = 0; i < facilityKeys.length; i++) {
+            cards[addr].auth[facilityKeys[i]].ip = bytes32(0);
+            cards[addr].auth[facilityKeys[i]].name = bytes32(0);
+            cards[addr].auth[facilityKeys[i]].status = bytes32(0);
         }
-        updateCardAuth(addr, auth);
+        for(i = 0; i < ips.length; i++) {
+            cards[addr].auth[ips[i]].ip = facilitys[ips[i]].ip;
+            cards[addr].auth[ips[i]].name = facilitys[ips[i]].name;
+            cards[addr].auth[ips[i]].status = facilitys[ips[i]].status;
+        }
+        updateCardAuth(addr, ips);
     }
     
     function access(address addr, bytes32 facilityIp, uint256 accessTimestamp, bytes32 yearMonth) public returns(bool isAuthorized) {

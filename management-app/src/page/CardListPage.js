@@ -46,6 +46,7 @@ function CardListPage() {
   const facilityList = useFacilityList()
   const [cardAuthTarget, setCardAuthTarget] = useState()
   const [cardAuthList, setCardAuthList] = useState([])
+  console.log()
   useEffect(() => {
     if (facilityList > 0) {
       setCardAuthList(facilityList)

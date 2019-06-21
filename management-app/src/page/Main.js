@@ -24,6 +24,15 @@ const useStyles = makeStyles({
 })
 
 function Main() {
+  // React.useEffect(() => {
+  //   ApiUtil.createCard('lost_card', '101', '101', 'SUSPENDED')
+  //   ApiUtil.createCard('card0001', '101', '101')
+  //   ApiUtil.createCard('card0002', '101', '102')
+  //   ApiUtil.createFacility('10.0.0.1', 'SAUNA')
+  //   ApiUtil.createFacility('10.0.0.2', 'GYM')
+  //   ApiUtil.createFacility('10.0.0.3', 'PILATES_ROOM')
+  //   ApiUtil.createFacility('10.0.0.4', 'COOKING_ROOM')
+  // }, [])
   const [mainOptions, setMainOptions] = useState({
     menuIndex: 0,
     pageTitle: "카드 리스트",

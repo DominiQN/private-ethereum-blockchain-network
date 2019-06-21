@@ -1,7 +1,6 @@
 import Web3 from 'web3'
 import { abi, contractAddr, defaultAccount, uri } from '../constant/ApiConst'
-import { ipToInt } from './CommonUtil'
-import { get } from 'https';
+
 
 const web3 = new Web3(Web3.givenProvider || uri, null, {})
 const contract = new web3.eth.Contract(abi, contractAddr, {
@@ -37,7 +36,7 @@ const ApiUtil = {
         ApiUtil.stringToBytes32(ip),
         ApiUtil.stringToBytes32(name),
         ApiUtil.stringToBytes32(status)
-      ).send({ from: defaultAccount, gas: 200000 })
+      ).send({ from: defaultAccount, gas: 300000 })
         .then(res => console.log(res))
     })
   },
@@ -72,7 +71,7 @@ const ApiUtil = {
           ApiUtil.stringToBytes32(status),
           ApiUtil.stringToBytes32(dong),
           ApiUtil.stringToBytes32(ho),
-        ).send({ from: defaultAccount, gas: 300000 })
+        ).send({ from: defaultAccount, gas: 500000 })
           .then(res => console.log(res))
       })
     })
@@ -119,11 +118,11 @@ const ApiUtil = {
   updateAuth: (addr, ips = []) => {
     ApiUtil.unlockAccount(defaultAccount, 'bridge').then(() => {
       console.log('unlock')
-      console.log('updateAuth')
+      console.log('updateAuth, addr:', addr, 'ips:', ips)
       contract.methods.updateAuth(
         addr,
         ips.map(ip => ApiUtil.stringToBytes32(ip))
-      ).send({ from: defaultAccount, gas: 300000 })
+      ).send({ from: defaultAccount, gas: 1000000 })
         .then(res => console.log(res))
     })
   },
@@ -133,7 +132,7 @@ const ApiUtil = {
       console.log('clearAuth')
       contract.methods.clearAuth(
         addr
-      ).send({ from: defaultAccount, gas: 200000 })
+      ).send({ from: defaultAccount, gas: 300000 })
         .then(res => console.log(res))
     })
   },
@@ -168,7 +167,7 @@ const ApiUtil = {
         ApiUtil.stringToBytes32(ip),
         date.getTime(),
         ApiUtil.stringToBytes32(ApiUtil.getYearMonth(date))
-      ).send({ from: defaultAccount, gas: 100000 })
+      ).send({ from: defaultAccount, gas: 200000 })
         .then(res => console.log(res))
     })
   },

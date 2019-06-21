@@ -1,6 +1,6 @@
 const uri = 'ws://175.207.46.3:8546'
 
-const contractAddr = '0xb3e1f408af6872014061b3bf9faa1b46d7a35f78'
+const contractAddr = '0x5020f41add9d34223af389f8ec0cbe8b96307af4'
 
 const defaultAccount = '0xa107aa8103ebfa0f79c054bdb470ddc7e4474651'
 
@@ -93,7 +93,7 @@ const abi = [
 				"type": "address"
 			},
 			{
-				"name": "auth",
+				"name": "ips",
 				"type": "bytes32[]"
 			}
 		],
