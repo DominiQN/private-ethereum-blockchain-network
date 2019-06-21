@@ -7,13 +7,8 @@ import CardCreatePage from './CardCreatePage'
 import HistoryPage from './HistoryPage'
 import Styles from '../constant/Styles';
 import TitleBar from '../component/TitleBar';
-import { mockCardList } from '../util/MockDataUtil'
 import CardReaderPage from './CardReaderPage';
 import ApiUtil from '../util/ApiUtil';
-
-const MockContext = React.createContext({
-  cardList: mockCardList,
-})
 
 const useStyles = makeStyles({
   main: {

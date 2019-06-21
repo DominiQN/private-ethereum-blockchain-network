@@ -61,7 +61,7 @@ function CardListPage() {
         })))
       }, cardAuthTarget.addr)
     }
-  }, [cardAuthTarget])
+  }, [cardAuthTarget, facilityList])
 
   const onViewButtonClick = (cardData) => {
     setCardAuthTarget(cardData)
