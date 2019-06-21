@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Checkbox } from '@material-ui/core';
+import { Button, Checkbox, CircularProgress, LinearProgress } from '@material-ui/core';
 import GenericTable from '../component/GenericTable'
 import GenericDialog from '../component/GenericDialog'
 import ApiUtil from '../util/ApiUtil';
@@ -46,6 +46,7 @@ function CardListPage() {
   const facilityList = useFacilityList()
   const [cardAuthTarget, setCardAuthTarget] = useState()
   const [cardAuthList, setCardAuthList] = useState([])
+  const [isAuthUpdating, setAuthUpdating]= useState(false)
   console.log()
   useEffect(() => {
     if (facilityList > 0) {
@@ -62,6 +63,18 @@ function CardListPage() {
       }, cardAuthTarget.addr)
     }
   }, [cardAuthTarget, facilityList])
+  useEffect(() => {
+    if (!isAuthUpdating) {
+      return
+    }
+    ApiUtil.listenUpdateAuth(cardAuthTarget.addr, (authInfo) => {
+      setCardAuthList(facilityList.map(facility => ({
+        ...facility,
+        checked: authInfo[facility.ip],
+      })))
+      setAuthUpdating(false)
+    })
+  }, [isAuthUpdating, cardAuthTarget])
 
   const onViewButtonClick = (cardData) => {
     setCardAuthTarget(cardData)
@@ -90,6 +103,7 @@ function CardListPage() {
       cardAuthList.filter(facility => facility.checked)
         .map(facility => facility.ip)
     )
+    setAuthUpdating(true)
   }
   return (
     <div style={{ marginTop: 24 }}>
@@ -110,15 +124,17 @@ function CardListPage() {
           <Button
             onClick={onUpdate}
             variant="outlined"
+            disabled={isAuthUpdating}
           >
             권한 수정
           </Button>
         }
       >
+        {isAuthUpdating && (<LinearProgress />)}
         <GenericTable
           tableHeader={facilityListTableHeader}
           dataScheme={facilityListDataScheme}
-          data={cardAuthList}
+          data={isAuthUpdating ? [] : cardAuthList}
           additionalCells={[SelectButtonWrapper(onSelectButtonClick)]}
         />
       </GenericDialog>

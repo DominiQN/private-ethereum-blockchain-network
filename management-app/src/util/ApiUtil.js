@@ -126,6 +126,19 @@ const ApiUtil = {
         .then(res => console.log(res))
     })
   },
+  listenUpdateAuth: (addr, updateCallback) => {
+    contract.once('updateCardAuth', {
+      filter: { addr },
+      fromBlock: 0,
+    }, (error, event) => {
+      const authList = event.returnValues.auth.map(ip => ApiUtil.bytes32ToString(ip))
+      const authInfo = authList.reduce((acc, currentIp) => ({
+        ...acc,
+        [currentIp]: true,
+      }), {})
+      updateCallback(authInfo)
+    })
+  },
   clearAuth: (addr) => {
     ApiUtil.unlockAccount(defaultAccount, 'bridge').then(() => {
       console.log('unlock')
